@@ -1,0 +1,594 @@
+// app.js
+
+const path = require('path');
+
+const express = require('express');
+const bodyParser = require('body-parser');
+const dotenv = require('dotenv');
+
+const cors=require('cors');
+const errorController = require('./controllers/error');
+
+const adminRoutes = require('./routes/admin');
+const shopRoutes = require('./routes/shop');
+
+const mongoConnect = require('./util/database').mongoConnect;
+
+const app = express();
+app.use(cors());
+dotenv.config();
+app.use(bodyParser.json({ extended: false }));
+
+
+
+app.use(bodyParser.urlencoded({ extended: false }));
+// app.use(express.static(path.join(__dirname, 'public')));
+
+app.use('/admin', adminRoutes);
+app.use('/shop', shopRoutes);
+app.use(errorController.get404);
+
+mongoConnect(()=>{
+  app.listen(2000)
+});
+
+
+
+/// admin.js routes
+
+const path = require('path');
+
+const express = require('express');
+
+const adminController = require('../controllers/admin');
+
+const router = express.Router();
+
+// /admin/products => GET
+router.get('/products', adminController.getProducts);
+
+// /admin/add-product => POST
+router.post('/add-product', adminController.postAddProduct);
+
+router.post('/edit-product', adminController.postEditProduct);
+
+router.get('/delete-product/:productId', adminController.postDeleteProduct);
+
+module.exports = router;
+
+//shop.js routes
+
+const path = require('path');
+
+const express = require('express');
+
+const shopController = require('../controllers/shop');
+
+const router = express.Router();
+
+router.get('/', shopController.getIndex);
+
+router.get('/products', shopController.getProducts);
+
+ router.get('/products/:productId', shopController.getProduct);
+
+module.exports = router;
+
+/// admin.js controlers
+const Product = require('../models/product');
+const mongodb = require('mongodb');
+
+const ObjectId= mongodb.ObjectId;
+
+
+exports.postAddProduct = async (req, res, next) => {
+ // console.log(req.body)
+  const title = req.body.title;
+  const imageUrl = req.body.imageUrl;
+  const price = req.body.price;
+  const description = req.body.description;
+ const product=new Product(title,imageUrl,price,description);
+ product
+ .save()
+    .then(async (result) => {
+      console.log(JSON.stringify(result))
+    await res.send(result)
+    })
+    .catch(err => {
+      console.log(err);
+    });
+};
+
+exports.postEditProduct = (req, res, next) => {
+  const prodId = req.body.Id;
+  const updatedTitle = req.body.title;
+  const updatedPrice = req.body.price;
+  const updatedImageUrl = req.body.imageUrl;
+  const updatedDesc = req.body.description;
+  const product=new Product(updatedTitle,updatedImageUrl,updatedPrice,updatedDesc,new ObjectId(prodId));
+  product.save()
+    .then(result => {
+     res.json(result)
+    })
+    .catch(err => console.log(err));
+};
+
+exports.getProducts = (req, res, next) => {
+  Product
+    .fetchAll()
+    .then(products => {
+     res.json(products)
+    })
+    .catch(err => console.log(err));
+};
+
+exports.postDeleteProduct = (req, res, next) => {
+  const prodId = req.body.productId;
+  Product.deleteById(prodId)
+    .then(() => {
+      res.json({message:'Product Deleted'})
+    })
+    .catch(err => console.log(err));
+};
+
+// shop.js controllers
+
+const Product = require('../models/product');
+exports.getProducts = (req, res, next) => {
+  Product.fetchAll()
+    .then(products => {
+     res.json(products)
+    })
+    .catch(err => {
+      console.log(err);
+    });
+};
+
+exports.getProduct = (req, res, next) => {
+  const prodId = req.params.productId;
+  console.log(prodId)
+  Product.findById(prodId)
+    .then(product => {
+      res.json(product)
+    })
+    .catch(err => console.log(err));
+};
+
+exports.getIndex = (req, res, next) => {
+  Product.fetchAll()
+    .then(products => {
+     res.json(products)
+    })
+    .catch(err => {
+      console.log(err);
+    });
+};
+
+
+// product.js  models
+
+const getDb=require('../util/database').getDb;
+const mongodb = require('mongodb');
+
+class Product{
+  constructor(title,imageUrl,price,description,id){
+    this.title=title;
+    this.price=price;
+    this.imageUrl=imageUrl;
+    this.description=description;
+    this._id=id
+
+  }
+
+   save(){
+    const db=getDb();
+    let dbOp;
+    if(this._id){
+      // Update product
+      dbOp=  db.collection('products').updateOne({_id: new mongodb.ObjectId(this._id)},{$set:this})
+    }else{
+      dbOp=  db.collection('products').insertOne(this)
+    }
+    return dbOp
+    .then(result=>{
+      console.log(result);
+      return result
+      
+    }).catch(err=>{
+      console.log(err)
+    })
+
+  }
+  static fetchAll(){
+    const db=getDb();
+    return db.collection('products')
+    .find().toArray()
+    .then(products=>{
+     // console.log(products);
+      return products
+      
+    }).catch(err=>{
+      console.log(err)
+    })
+  }
+static findById(prodId){
+  const db=getDb();
+    return db.collection('products')
+    .find({_id: new mongodb.ObjectId(prodId)}).next()
+    .then(product=>{
+      console.log(product);
+      return product
+      
+    }).catch(err=>{
+      console.log(err)
+    })
+}
+static deleteById(prodId){
+  const db=getDb();
+    return db.collection('products')
+    .deleteOne({_id: new mongodb.ObjectId(prodId)})
+    .then(()=>{
+      console.log("Deleted");
+     // return product
+      
+    }).catch(err=>{
+      console.log(err)
+    })
+}
+
+}
+
+module.exports = Product;
+
+
+/// edit-product.html views
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Add Product</title>
+    <link rel="stylesheet" href="../../public/css/main.css">
+    <link rel="stylesheet" href="../../public/css/forms.css">
+    <link rel="stylesheet" href="../../public/css/product.css">
+</head>
+
+<body>
+    <div class="backdrop"></div>
+    <header class="main-header">
+        <button id="side-menu-toggle">Menu</button>
+        <nav class="main-header__nav">
+            <ul class="main-header__item-list">
+                <li class="main-header__item">
+                    <a  href="../shop/index.html">Shop</a>
+                </li>
+                <li class="main-header__item">
+                    <a  href="../shop/product-list.html">Products</a>
+                </li>
+                <li class="main-header__item">
+                    <a  href="../shop/cart.html">Cart</a>
+                </li>
+                <li class="main-header__item">
+                    <a  href="../shop/orders.html">Orders</a>
+                </li>
+                <li class="main-header__item">
+                    <a  href="edit-product.html">Add Product
+                    </a>
+                </li>
+                <li class="main-header__item">
+                    <a  href="products.html">Admin Products
+                    </a>
+                </li>
+            </ul>
+        </nav>
+    </header>
+    
+    <nav class="mobile-nav">
+            <ul class="mobile-nav__item-list">
+                    <li class="mobile-nav__item">
+                        <a  href="../shop/index.html">Shop</a>
+                    </li>
+                    <li class="main-header__item">
+                        <a  href="../shop/product-list.html">Products</a>
+                    </li>
+                    <li class="main-header__item">
+                        <a  href="../shop/cart.html">Cart</a>
+                    </li>
+                    <li class="main-header__item">
+                        <a  href="../shop/orders.html">Orders</a>
+                    </li>
+                    <li class="main-header__item">
+                        <a  href="edit-product.html">Add Product
+                        </a>
+                    </li>
+                    <li class="main-header__item">
+                        <a  href="products.html">Admin Products
+                        </a>
+                    </li>
+                </ul>
+    </nav>
+
+    <main>
+        <form class="product-form">
+            <input type="text" name="rowIndex" id="rowIndex" hidden>
+            <div class="form-control">
+                <label for="title">Title</label>
+                <input type="text" name="title" id="title" >
+            </div>
+            <div class="form-control">
+                <label for="imageUrl">Image URL</label>
+                <input type="text" name="imageUrl" id="imageUrl" >
+            </div>
+            <div class="form-control">
+                <label for="price">Price</label>
+                <input type="number" name="price" id="price" step="0.01" >
+            </div>
+            <div class="form-control">
+                <label for="description">Description</label>
+                <textarea name="description" id="description" rows="5"></textarea>
+            </div>
+            <button class="btn" id="addButton" type="submit">Add Product</button>
+        </form>
+    </main>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/axios/1.6.7/axios.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
+    <script src="../../public/js/main.js"></script>
+    <script src="./products.js"></script>
+   
+</body>
+
+</html>
+
+/// products.js views
+
+let editproduct=JSON.parse(sessionStorage.getItem('editproduct'))
+
+
+    document.getElementById('addButton').addEventListener('click',(event)=>{
+        addexpense(event);
+      })
+      
+          // add user 
+            function addexpense(event) {
+           event.preventDefault();
+            const title=document.getElementById('title').value;
+            const imageUrl=document.getElementById('imageUrl').value;
+            const price=document.getElementById('price').value;
+            const description=document.getElementById('description').value;
+            const rowIndex=document.getElementById('rowIndex').value;
+        //  console.log(title)
+            const obj={
+              title,
+              imageUrl,
+              price,
+              description
+      
+            }
+         //   console.log(obj)
+            if (rowIndex === '') {
+              axios.post('http://localhost:2000/admin/add-product',obj).then(result=>{
+                console.log(result)
+                window.location.href='./products.html'
+              }).catch(err => {
+                  console.log(err);
+             });
+             
+            }else{
+                updateProduct(rowIndex, title, imageUrl, price,description);
+            }
+             resetForm();
+          }
+      
+     
+      
+     // edit form
+     if(editproduct!=''){
+     
+          //console.log(editproduct.price)
+          document.getElementById('title').value=editproduct.title;
+          document.getElementById('imageUrl').value=editproduct.imageUrl;
+          document.getElementById('price').value=parseInt(editproduct.price);
+          document.getElementById('description').value = editproduct.description;
+          document.getElementById('rowIndex').value = editproduct.id;
+          document.getElementById('addButton').innerHTML="Update";  
+         
+    
+  }
+      
+    //  update user
+      async function updateProduct(Id,title,imageUrl,price,description){
+        try{
+          console.log(Id)
+          const obj={
+              Id,
+              title,
+              imageUrl,
+              price,
+              description
+            }
+          const updatedata=await axios.post(`http://localhost:2000/admin/edit-product`,obj)
+          sessionStorage.removeItem('editproduct')
+          window.location.href='./products.html'
+             }catch(error){
+              console.log(error);
+             }
+      }
+    
+          //reset form
+      
+          function resetForm(){
+           document.getElementById('title').value='';
+          document.getElementById('description').value='';
+          document.getElementById('price').value='';
+          document.getElementById('imageUrl').value='';
+           document.getElementById('rowIndex').value = '';
+          document.getElementById('addButton').innerHTML = 'Add Expense';
+          
+       }
+      
+    // products.html views
+
+
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Add Product</title>
+    <link rel="stylesheet" href="../../public/css/main.css">
+    <link rel="stylesheet" href="../../public/css/forms.css">
+    <link rel="stylesheet" href="../../public/css/product.css">
+    </head>
+
+    <body>
+        <body>
+            <div class="backdrop"></div>
+            <header class="main-header">
+                <button id="side-menu-toggle">Menu</button>
+                <nav class="main-header__nav">
+                    <ul class="main-header__item-list">
+                        <li class="main-header__item">
+                            <a  href="../shop/index.html">Shop</a>
+                        </li>
+                        <li class="main-header__item">
+                            <a  href="../shop/product-list.html">Products</a>
+                        </li>
+                        <li class="main-header__item">
+                            <a  href="../shop/cart.html">Cart</a>
+                        </li>
+                        <li class="main-header__item">
+                            <a  href="../shop/orders.html">Orders</a>
+                        </li>
+                        <li class="main-header__item">
+                            <a  href="edit-product.html">Add Product
+                            </a>
+                        </li>
+                        <li class="main-header__item">
+                            <a  href="products.html">Admin Products
+                            </a>
+                        </li>
+                    </ul>
+                </nav>
+            </header>
+            
+            <nav class="mobile-nav">
+                    <ul class="mobile-nav__item-list">
+                            <li class="mobile-nav__item">
+                                <a  href="../shop/index.html">Shop</a>
+                            </li>
+                            <li class="main-header__item">
+                                <a  href="../shop/product-list.html">Products</a>
+                            </li>
+                            <li class="main-header__item">
+                                <a  href="../shop/cart.html">Cart</a>
+                            </li>
+                            <li class="main-header__item">
+                                <a  href="../shop/orders.html">Orders</a>
+                            </li>
+                            <li class="main-header__item">
+                                <a  href="edit-product.html">Add Product
+                                </a>
+                            </li>
+                            <li class="main-header__item">
+                                <a  href="products.html">Admin Products
+                                </a>
+                            </li>
+                        </ul>
+            </nav>
+
+            <main>
+               
+                    <div id="grid" class="grid">
+                       
+                           
+                           
+                    </div>
+                 
+                      
+                       
+            </main>
+            <script src="https://cdnjs.cloudflare.com/ajax/libs/axios/1.6.7/axios.min.js"></script>
+            <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
+    <script src="../../public/js/main.js"></script>
+    <script src="./produtsfetch.js"></script>
+
+</body>
+
+</html>
+
+// productsfetch.html views
+
+window.addEventListener("DOMContentLoaded",  () =>{
+    axios.get('http://localhost:2000/admin/products').then(response=>{
+    // console.log(response)
+    
+       showNewproductOnScreen(response.data)
+     
+   }).catch(err=>console.log(err));
+
+});
+
+
+function showNewproductOnScreen(products){
+    let tableBody =  document.getElementById('grid');
+   // console.log(tableBody)
+  if(products.length>0){
+   
+    
+    for (let i=0;i<products.length;i++) {
+        let row=` <article class="card product-item">
+        <header class="card__header">
+            <h1 class="product__title">
+                ${products[i].title}
+            </h1>
+        </header>
+        <div class="card__image">
+            <img src="${products[i].imageUrl}" alt="${products[i].title}">
+        </div>
+        <div class="card__content">
+            <h2 class="product__price">$
+               ${products[i].price}
+            </h2>
+            <p class="product__description">
+               ${products[i].description}
+            </p>
+        </div>
+        <div class="card__actions">
+        <button class="btn" onclick="edit('${products[i]._id}','${products[i].title}','${products[i].imageUrl}',' ${products[i].price}',' ${products[i].description}')">Edit</button>
+           
+                <button class="btn" onclick="delete_product('${products[i]._id}','${this.parentNode}')">Delete</button>
+        </div>
+    </article>`
+    tableBody.insertAdjacentHTML('beforeend', row);
+    }
+  }else{
+    let row='<h1>No Products Found</h1>'
+    tableBody.insertAdjacentHTML('afterend', row);
+  }
+        
+}
+
+
+async function edit(id,title,imageUrl,price,description) {
+    let obj={
+        id,
+        title,
+        imageUrl,
+        price,
+        description
+    }
+    sessionStorage.setItem('editproduct',JSON.stringify(obj))
+    window.location.href='./edit-product.html'
+      }
+
+
+      async function delete_product(id, row) {
+    //    console.log(row);
+    //    row.removechild(row)
+      let delete_product= await  axios.get(`http://localhost:2000/admin/delete-product/${id}`)
+        console.log(delete_product)
+          }
