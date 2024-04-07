@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html>
+<head>
+ <title>Expense App</title>
+ <meta charset="utf-8">
+ <meta name="viewport" content="width=device-width, initial-scale=1">
+ <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+</head>
+ <body>
+    <div class="container">
+     <div class="row">
+      <div class="col-md-8 mx-auto">
+       <h1>Expense App</h1>
+       <form onsubmit="addexpense(event)">
+        <input type="hidden" id="Id">
+        <input type="hidden" id="rowIndex">
+        <div class="form-group">
+          <label for="amount">Expense Amount:</label>
+          <input type="number" id="amount" name="amount" class="form-control" required>
+         </div>
+      <div class="form-group">
+       <label for="description">Choos a Description:</label>
+       <input type="text" id="description" name="description" class="form-control" required>
+      </div>
+      <div class="form-group">
+          <label for="category">Choose a Category:</label>
+          <select id="category" class="form-control" name="category" required>
+      <option value="fuel">fuel</option><option value="electricity">electricity</option><option value="movie">movie</option><option value="food">food</option>
+          </select>
+         </div>
+      <button type="submit" id="addButton" class="btn btn-primary">Add Expense</button>
+       </form>
+       <br>
+       <table class="table table-striped table-bordered" id="expenseTable">
+        <thead>
+         <tr>
+          <th hidden>expense id</th>
+          <th>Amount</th>
+          <th>Description</th>
+          <th>Category</th>
+          <th>Actions</th>
+         </tr>
+        </thead>
+        <tbody></tbody>
+       </table>
+      </div>
+     </div>
+    </div>
+  
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/axios/1.6.7/axios.min.js"></script>
+    
+    <script src="./expense.js"></script>
+ </body></html>
