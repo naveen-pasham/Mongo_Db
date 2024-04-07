@@ -22,10 +22,10 @@ function showCartOnScreen(products){
     
     for (let i=0;i<products.length;i++) {
         let row=`  <li class="cart__item">
-        <h1>${products[i].title}</h1>
+        <h1>${products[i].productId.title}</h1>
         <h2>Quantity: ${products[i].quantity}</h2>
        
-            <button class="btn danger" onclick="deleteCartItem('${products[i]._id}')">Delete</button>
+            <button class="btn danger" onclick="deleteCartItem('${products[i].productId._id}')">Delete</button>
        
     </li>`
     tableBody.insertAdjacentHTML('beforeend', row);
