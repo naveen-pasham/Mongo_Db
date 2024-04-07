@@ -56,7 +56,7 @@ let editproduct=JSON.parse(sessionStorage.getItem('editproduct'))
     //  update user
       async function updateProduct(Id,title,imageUrl,price,description){
         try{
-          console.log(Id)
+         // console.log(Id)
           const obj={
               Id,
               title,

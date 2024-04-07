@@ -66,5 +66,6 @@ async function edit(id,title,imageUrl,price,description) {
     //    console.log(row);
     //    row.removechild(row)
       let delete_product= await  axios.get(`http://localhost:2000/admin/delete-product/${id}`)
-        console.log(delete_product)
+       // console.log(delete_product)
+       
           }

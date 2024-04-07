@@ -1,6 +1,6 @@
 window.addEventListener("DOMContentLoaded",  () =>{
     axios.get('http://localhost:2000/shop/products').then(response=>{
-     console.log(response)
+     //console.log(response)
     
        showNewproductOnScreen(response.data)
      
