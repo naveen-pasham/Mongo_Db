@@ -15,6 +15,7 @@ exports.postAddProduct = async (req, res, next) => {
   imageUrl:imageUrl,
   price:price,
   description:description,
+  userId:req.user
   //null,req.user._id
 });
  product
@@ -75,6 +76,8 @@ exports.postEditProduct = (req, res, next) => {
 exports.getProducts = (req, res, next) => {
   Product
     .find()
+    // .select('title price -_id')  //  we can select what data we want to show -- it shows or retrive only title and price data and excludes ids
+    // .populate('userId','username')  // it use to retrieve req.user products and second parameter use to select which dat we want
     .then(products => {
      res.json(products)
     })
