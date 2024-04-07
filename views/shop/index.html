@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Index Page</title>
+    <link rel="stylesheet" href="../../public/css/main.css">
+
+    <link rel="stylesheet" href="../../public/css/product.css">
+</head>
+<body>
+    <div class="backdrop"></div>
+    <header class="main-header">
+        <button id="side-menu-toggle">Menu</button>
+        <nav class="main-header__nav">
+            <ul class="main-header__item-list">
+                <li class="main-header__item">
+                    <a class="pathactive" href="./index.html">Shop</a>
+                </li>
+                <li class="main-header__item">
+                    <a class="productsactive" href="./product-list.html">Products</a>
+                </li>
+                <li class="main-header__item">
+                    <a class="pathcaractive" href="./cart.html">Cart</a>
+                </li>
+                <li class="main-header__item">
+                    <a class="pathordersactive" href="./orders.html">Orders</a>
+                </li>
+                <li class="main-header__item">
+                    <a class="pathadminaddproductactive" href="../admin/edit-product.html">Add Product
+                    </a>
+                </li>
+                <li class="main-header__item">
+                    <a class="pathadminproductsactive" href="../admin/products.html">Admin Products
+                    </a>
+                </li>
+            </ul>
+        </nav>
+    </header>
+    <nav class="mobile-nav">
+        <ul class="mobile-nav__item-list">
+                <li class="mobile-nav__item">
+                    <a class="" href="./index.html">Shop</a>
+                </li>
+                <li class="main-header__item">
+                    <a class="productsactive" href="./product-list.html">Products</a>
+                </li>
+                <li class="main-header__item">
+                    <a class="pathcaractive" href="./cart.html">Cart</a>
+                </li>
+                <li class="main-header__item">
+                    <a class="pathordersactive" href="./orders.html">Orders</a>
+                </li>
+                <li class="main-header__item">
+                    <a class="pathadminaddproductactive" href="../admin/edit-product.html">Add Product
+                    </a>
+                </li>
+                <li class="main-header__item">
+                    <a class="pathadminproductsactive" href="../admin/products.html">Admin Products
+                    </a>
+                </li>
+            </ul>
+    </nav>
+    <main>
+            <div id="grid" class="grid">
+                    
+            </div>
+           
+    </main>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/axios/1.6.7/axios.min.js"></script>
+    <script src="../../public/js/main.js"></script>
+    <script src="./index.js"></script>
+</body>
+</html>
+<!--
+    <main>
+        <% if (prods.length > 0) { %>
+            <div class="grid">
+                <% for (let product of prods) { %>
+                    <article class="card product-item">
+                        <header class="card__header">
+                            <h1 class="product__title"><%= product.title %></h1>
+                        </header>
+                        <div class="card__image">
+                            <img src="<%= product.imageUrl %>"
+                                alt="<%= product.title %>">
+                        </div>
+                        <div class="card__content">
+                            <h2 class="product__price">$<%= product.price %></h2>
+                            <p class="product__description"><%= product.description %></p>
+                        </div>
+                        <div class="card__actions">
+                                <a href="/products/<%= product.id %>" class="btn">Details</a>
+                            <%- include('../includes/add-to-cart.ejs', {product: product}) %>
+                        </div>
+                    </article>
+                <% } %>
+            </div>
+        <% } else { %>
+            <h1>No Products Found!</h1>
+        <% } %>
+    </main>
