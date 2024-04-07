@@ -2,7 +2,7 @@
 window.addEventListener("DOMContentLoaded",  async() =>{
     try{
     const response=await axios.get('http://localhost:2000/shop/orders')
-     console.log(response)
+    // console.log(response)
     
        showOrderOnScreen(response.data)
     }
@@ -25,8 +25,8 @@ async function showOrderOnScreen(order){
         <h1>Order - # ${order[i]._id}</h1>
     </li>`
     tableBody.insertAdjacentHTML('afterbegin', row);
-     await  order[i].items.forEach(item=>{
-            let row1=` <li class="orders__products-item">${item.title} (${item.quantity})</li>`
+     await  order[i].products.forEach(item=>{
+            let row1=` <li class="orders__products-item">${item.product.title} (${item.quantity})</li>`
             ullist.insertAdjacentHTML('beforeend', row1)
         })
    
