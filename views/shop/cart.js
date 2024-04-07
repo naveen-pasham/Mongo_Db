@@ -43,3 +43,11 @@ async function deleteCartItem(id){
     const response=await axios.post('http://localhost:2000/shop/cart-delete-item',{prodId:id});
     console.log(response)
 }
+
+document.getElementById('ordernow').addEventListener('click', ()=>{
+    order();
+})
+async function order(){
+    const response= await axios.post('http://localhost:2000/shop/create-order')
+    console.log(response)
+}

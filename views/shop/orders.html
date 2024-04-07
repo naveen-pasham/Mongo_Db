@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>orders</title>
+    <link rel="stylesheet" href="../../public/css/main.css">
+    <link rel="stylesheet" href="../../public/css/orders.css">
+</head>
+<body>
+    <div class="backdrop"></div>
+    <header class="main-header">
+        <button id="side-menu-toggle">Menu</button>
+        <nav class="main-header__nav">
+            <ul class="main-header__item-list">
+                <li class="main-header__item">
+                    <a class="pathactive" href="./index.html">Shop</a>
+                </li>
+                <li class="main-header__item">
+                    <a class="productsactive" href="./product-list.html">Products</a>
+                </li>
+                <li class="main-header__item">
+                    <a class="pathcaractive" href="./cart.html">Cart</a>
+                </li>
+                <li class="main-header__item">
+                    <a class="pathordersactive" href="./orders.html">Orders</a>
+                </li>
+                <li class="main-header__item">
+                    <a class="pathadminaddproductactive" href="../admin/edit-product.html">Add Product
+                    </a>
+                </li>
+                <li class="main-header__item">
+                    <a class="pathadminproductsactive" href="../admin/products.html">Admin Products
+                    </a>
+                </li>
+            </ul>
+        </nav>
+    </header>
+    <nav class="mobile-nav">
+        <ul class="mobile-nav__item-list">
+                <li class="mobile-nav__item">
+                    <a class="" href="./index.html">Shop</a>
+                </li>
+                <li class="main-header__item">
+                    <a class="productsactive" href="./product-list.html">Products</a>
+                </li>
+                <li class="main-header__item">
+                    <a class="pathcaractive" href="./cart.html">Cart</a>
+                </li>
+                <li class="main-header__item">
+                    <a class="pathordersactive" href="./orders.html">Orders</a>
+                </li>
+                <li class="main-header__item">
+                    <a class="pathadminaddproductactive" href="../admin/edit-product.html">Add Product
+                    </a>
+                </li>
+                <li class="main-header__item">
+                    <a class="pathadminproductsactive" href="../admin/products.html">Admin Products
+                    </a>
+                </li>
+            </ul>
+    </nav>
+    <main>
+        <ul id="showorders" class="orders">
+            <ul id="orders__products" class="orders__products">
+            </ul>
+        </ul>
+    </main>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/axios/1.6.7/axios.min.js"></script>
+    <script src="../../public/js/main.js"></script>
+    <script src="./oredrs.js"></script>
+</body>
+</html>
+<!--
+        <main>
+            <% if (orders.length <= 0) { %>
+                <h1>Nothing there!</h1>
+            <% } else { %>
+                <ul class="orders">
+                    <% orders.forEach(order => { %>
+                        <li class="orders__item">
+                            <h1>Order - # <%= order.id %></h1>
+                            <ul class="orders__products">
+                                <% order.products.forEach(product => { %>
+                                    <li class="orders__products-item"><%= product.title %> (<%= product.orderItem.quantity %>)</li>
+                                <% }); %>
+                            </ul>
+                        </li>
+                    <% }); %>
+                </ul>
+            <% } %>
+        </main>
+        <%- include('../includes/end.ejs') %>
