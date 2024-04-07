@@ -41,7 +41,8 @@ function showCartOnScreen(products){
 
 async function deleteCartItem(id){
     const response=await axios.post('http://localhost:2000/shop/cart-delete-item',{prodId:id});
-    console.log(response)
+   // console.log(response)
+   window.location.href='./cart.html'
 }
 
 document.getElementById('ordernow').addEventListener('click', ()=>{
@@ -51,3 +52,4 @@ async function order(){
     const response= await axios.post('http://localhost:2000/shop/create-order')
     console.log(response)
 }
+
