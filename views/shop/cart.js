@@ -25,7 +25,7 @@ function showCartOnScreen(products){
         <h1>${products[i].title}</h1>
         <h2>Quantity: ${products[i].quantity}</h2>
        
-            <button class="btn danger" >Delete</button>
+            <button class="btn danger" onclick="deleteCartItem('${products[i]._id}')">Delete</button>
        
     </li>`
     tableBody.insertAdjacentHTML('beforeend', row);
@@ -36,4 +36,10 @@ function showCartOnScreen(products){
     tableBody.insertAdjacentHTML('afterend', row);
   }
         
+}
+
+
+async function deleteCartItem(id){
+    const response=await axios.post('http://localhost:2000/shop/cart-delete-item',{prodId:id});
+    console.log(response)
 }
