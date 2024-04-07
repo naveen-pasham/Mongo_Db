@@ -16,12 +16,12 @@ exports.postAddProduct = async (req, res, next) => {
   price:price,
   description:description,
   userId:req.user
-  //null,req.user._id
+  
 });
  product
  .save()
     .then(async (result) => {
-      console.log(JSON.stringify(result))
+    //  console.log(JSON.stringify(result))
     await res.send(result)
     })
     .catch(err => {
